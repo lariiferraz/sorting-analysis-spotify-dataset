@@ -74,17 +74,21 @@ def show_detailed_tables(filename):
         print(f"\n================ {algo} =================\n")
         for pattern in ["random", "sorted", "reversed"]:
             print(f"--- Padrão: {pattern.capitalize()} ---")
-            print(f"{'Tamanho':>10} | {'Tempo(ms)':>10} | {'Memória(KB)':>12} | {'Comparisons':>12} | {'Swaps':>8}")
-            print("-" * 65)
+            print(f"{'Tamanho':>12} | {'Tempo(ms)':>15} | {'Memória(KB)':>15} | {'Comparisons':>15} | {'Swaps':>10}")
+            print("-" * 75)
             for size in sorted([int(s) for s in results.keys()]):
                 metrics = results[str(size)][algo].get(pattern, {})
                 if metrics.get("time_ms") is None:
-                    print(f"{size:>10} | {'-':>10} | {'-':>12} | {'-':>12} | {'-':>8}")
+                    print(f"{size:>12} | {'-':>15} | {'-':>15} | {'-':>15} | {'-':>10}")
                 else:
-                    print(f"{size:>10} | {metrics.get('time_ms',0):>10.2f} | "
-                          f"{metrics.get('memory_kb',0):>12.2f} | {metrics.get('comparisons',0):>12} | "
-                          f"{metrics.get('swaps',0):>8}")
+                    # Formatação com vírgula decimal e ponto de milhar
+                    time_fmt = f"{metrics.get('time_ms',0):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+                    mem_fmt = f"{metrics.get('memory_kb',0):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+                    comp_fmt = f"{metrics.get('comparisons',0):,}".replace(",", ".")
+                    swaps_fmt = f"{metrics.get('swaps',0):,}".replace(",", ".")
+                    print(f"{size:>12} | {time_fmt:>15} | {mem_fmt:>15} | {comp_fmt:>15} | {swaps_fmt:>10}")
             print("\n")
+
 
 
 # -------------------------
