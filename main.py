@@ -1,8 +1,10 @@
 from benchmark.runner import run_full_benchmark, run_quick_benchmark
 import json
 import os
+import matplotlib.pyplot as plt
+from benchmark.graphs import generate_complete_graphs  # função que gera todos os gráficos
 
-ALL_RESULTS_FILE = "benchmark/results/all_results.json"   # benchmark grande
+ALL_RESULTS_FILE = "benchmark/results/all_results.json"   # benchmark completo
 QUICK_RESULTS_FILE = "benchmark/results/quick_results.json"  # teste rápido
 
 
@@ -20,8 +22,7 @@ def format_table(result_dict):
             p = patterns.get(pattern_name)
 
             if p and p.get("time_ms") is not None:
-
-                # valores podem não existir em benchmarks antigos → fallback seguro
+                # fallback seguro caso métricas não existam
                 time_ms = p.get("time_ms")
                 mem = p.get("memory_kb", 0.0)
                 comp = p.get("comparisons", 0)
@@ -59,6 +60,34 @@ def show_saved_results(filename, title):
 
 
 # -------------------------
+#  NOVA FUNÇÃO: TABELAS DETALHADAS
+# -------------------------
+def show_detailed_tables(filename):
+    if not os.path.exists(filename):
+        print(f"\n❌ Nenhum resultado salvo em {filename}")
+        return
+
+    with open(filename, "r") as f:
+        results = json.load(f)
+
+    for algo in next(iter(results.values())).keys():  # pega todos os algoritmos
+        print(f"\n================ {algo} =================\n")
+        for pattern in ["random", "sorted", "reversed"]:
+            print(f"--- Padrão: {pattern.capitalize()} ---")
+            print(f"{'Tamanho':>10} | {'Tempo(ms)':>10} | {'Memória(KB)':>12} | {'Comparisons':>12} | {'Swaps':>8}")
+            print("-" * 65)
+            for size in sorted([int(s) for s in results.keys()]):
+                metrics = results[str(size)][algo].get(pattern, {})
+                if metrics.get("time_ms") is None:
+                    print(f"{size:>10} | {'-':>10} | {'-':>12} | {'-':>12} | {'-':>8}")
+                else:
+                    print(f"{size:>10} | {metrics.get('time_ms',0):>10.2f} | "
+                          f"{metrics.get('memory_kb',0):>12.2f} | {metrics.get('comparisons',0):>12} | "
+                          f"{metrics.get('swaps',0):>8}")
+            print("\n")
+
+
+# -------------------------
 #  MENU PRINCIPAL
 # -------------------------
 def main():
@@ -68,7 +97,9 @@ def main():
         print("2 - Executar benchmark RÁPIDO")
         print("3 - Mostrar resultados COMPLETOS salvos")
         print("4 - Mostrar resultados RÁPIDOS salvos")
-        print("5 - Sair")
+        print("5 - Gerar gráficos a partir do benchmark completo")
+        print("6 - Sair")
+        print("7 - Mostrar tabelas detalhadas do benchmark completo")
 
         opt = input("\nEscolha uma opção: ")
 
@@ -89,8 +120,16 @@ def main():
             show_saved_results(QUICK_RESULTS_FILE, "resultado do benchmark rápido")
 
         elif opt == "5":
+            print("\n📊 Gerando gráficos a partir do benchmark completo...")
+            generate_complete_graphs()  # chama função para gerar gráficos
+
+        elif opt == "6":
             print("Saindo...")
             break
+
+        elif opt == "7":
+            print("\n📋 Mostrando tabelas detalhadas do benchmark completo...")
+            show_detailed_tables(ALL_RESULTS_FILE)
 
         else:
             print("Opção inválida.")
