@@ -32,7 +32,7 @@ O documento final estará disponível na pasta `/docs`.
 ---
 
 ## 👩‍💻 Autoria
-Projeto desenvolvido por **Larissa Oliveira Ferraz Damasceno** e **Nathan Espindola"", como parte da disciplina de **Estruturas de Dados**.
+Projeto desenvolvido por **Larissa Oliveira Ferraz Damasceno** e **Nathan Espindola**, como parte da disciplina de **Estruturas de Dados**.
 
 ---
 
